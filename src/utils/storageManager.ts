@@ -147,6 +147,23 @@ export class StorageManager {
     }
   }
 
+  getStorageInfo(): { used: number; total: number; percentage: number } {
+    try {
+      const data = this.getStorageData();
+      const dataSize = JSON.stringify(data).length;
+      const totalSize = 5 * 1024 * 1024; // 5MB typical localStorage limit
+
+      return {
+        used: dataSize,
+        total: totalSize,
+        percentage: (dataSize / totalSize) * 100,
+      };
+    } catch (error) {
+      console.error("Error getting storage info:", error);
+      return { used: 0, total: 0, percentage: 0 };
+    }
+  }
+
   private saveStorageData(data: StorageData): void {
     try {
       data.version = VERSION;

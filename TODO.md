@@ -51,19 +51,19 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 
 ### 3.1 Custom Hook'lar
 
-- [ ] `useLocalStorage` hook'unu oluştur
-- [ ] `useJsonData` hook'unu geliştir
-- [ ] `useOfflineStorage` hook'unu yaz
-- [ ] `useAutoSave` hook'unu implement et
-- [ ] `useTheme` hook'unu oluştur
+- [x] `useLocalStorage` hook'unu oluştur
+- [x] `useJsonData` hook'unu geliştir
+- [x] `useOfflineStorage` hook'unu yaz
+- [x] `useAutoSave` hook'unu implement et
+- [x] `useTheme` hook'unu oluştur
 
 ### 3.2 Storage Management
 
-- [ ] Local Storage API wrapper'ı yaz
+- [x] Local Storage API wrapper'ı yaz
 - [ ] IndexedDB integration'ı ekle
-- [ ] Auto-save mekanizmasını kur
-- [ ] Project management fonksiyonlarını implement et
-- [ ] Data backup/restore fonksiyonlarını yaz
+- [x] Auto-save mekanizmasını kur
+- [x] Project management fonksiyonlarını implement et
+- [x] Data backup/restore fonksiyonlarını yaz
 
 ## 4. UI COMPONENT'LERİ
 
