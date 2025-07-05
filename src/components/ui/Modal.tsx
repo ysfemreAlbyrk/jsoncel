@@ -46,7 +46,7 @@ export function Modal({
       {/* Modal */}
       <div
         className={cn(
-          "relative bg-background rounded-lg shadow-lg max-w-lg w-full mx-4 max-h-[90vh] overflow-auto",
+          "relative bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-lg w-full mx-4 max-h-[90vh] overflow-auto",
           className
         )}
       >

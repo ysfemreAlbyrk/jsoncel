@@ -70,7 +70,10 @@ export function CardDescription({
   ...props
 }: CardDescriptionProps) {
   return (
-    <p className={cn("text-sm text-muted-foreground", className)} {...props}>
+    <p
+      className={cn("text-sm text-gray-600 dark:text-gray-400", className)}
+      {...props}
+    >
       {children}
     </p>
   );
