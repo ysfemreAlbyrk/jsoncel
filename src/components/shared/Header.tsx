@@ -1,14 +1,17 @@
 import React from "react";
-import { FileText, Download, Upload, Settings } from "lucide-react";
+import { FileText, Upload, Settings } from "lucide-react";
 import { Button } from "../ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
+import { ExportButton } from "../editor/ExportButton";
 import { toast } from "../ui/ToastContainer";
+import type { JsonArray } from "../../types";
 
 interface HeaderProps {
   onImport?: () => void;
   onExport?: () => void;
   onSettings?: () => void;
   projectName?: string;
+  data?: JsonArray;
 }
 
 export function Header({
@@ -16,20 +19,14 @@ export function Header({
   onExport,
   onSettings,
   projectName,
+  data = [],
 }: HeaderProps) {
   const handleImport = () => {
     onImport?.();
-    toast.info("Import functionality coming soon!");
-  };
-
-  const handleExport = () => {
-    onExport?.();
-    toast.info("Export functionality coming soon!");
   };
 
   const handleSettings = () => {
     onSettings?.();
-    toast.info("Settings panel coming soon!");
   };
 
   return (
@@ -68,15 +65,11 @@ export function Header({
             Import
           </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleExport}
+          <ExportButton
+            data={data}
+            projectName={projectName || "Untitled Project"}
             className="hidden sm:flex"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export
-          </Button>
+          />
 
           <Button
             variant="ghost"

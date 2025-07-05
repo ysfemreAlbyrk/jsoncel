@@ -195,13 +195,13 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 - [x] Proje silme/yeniden adlandırma ekle
 - [x] Project switching functionality'sini implement et
 
-### 6.6 Export Functionality
+### 6.6 Export Functionality ✅
 
-- [ ] ExportButton component'ini oluştur
-- [ ] JSON export özelliğini ekle
-- [ ] CSV export özelliğini implement et
-- [ ] Excel export özelliğini ekle
-- [ ] File download functionality'sini implement et
+- [x] ExportButton component'ini oluştur
+- [x] JSON export özelliğini ekle
+- [x] CSV export özelliğini implement et
+- [x] Excel export özelliğini ekle
+- [x] File download functionality'sini implement et
 
 ## 7. ROUTING VE NAVİGASYON
 

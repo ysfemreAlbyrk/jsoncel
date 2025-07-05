@@ -4,6 +4,7 @@ import { Footer } from "../components/shared/Footer";
 import { JsonGrid } from "../components/editor/JsonGrid";
 import { FileUpload } from "../components/editor/FileUpload";
 import { ProjectManager } from "../components/editor/ProjectManager";
+import { ExportButton } from "../components/editor/ExportButton";
 import { Modal } from "../components/ui/Modal";
 import { Button } from "../components/ui/Button";
 import { useJsonData } from "../hooks/useJsonData";
@@ -119,8 +120,8 @@ export function EditorPage() {
   };
 
   const handleExport = () => {
-    // Export functionality will be implemented later
-    console.log("Exporting data:", data);
+    // Export functionality is now handled by ExportButton component
+    console.log("Export button clicked");
   };
 
   const handleImport = () => {
@@ -148,6 +149,7 @@ export function EditorPage() {
         {/* Header */}
         <Header
           projectName={projectName}
+          data={data}
           onExport={handleExport}
           onImport={handleImport}
           onSettings={handleSettings}
