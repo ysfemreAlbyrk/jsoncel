@@ -47,3 +47,4 @@ workbox-*.js
 *.temp
 
 PRD.md
+.cursor
