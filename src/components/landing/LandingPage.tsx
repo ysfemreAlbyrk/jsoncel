@@ -10,6 +10,8 @@ import {
 } from "../ui/Card";
 import { ThemeToggle } from "../shared/ThemeToggle";
 import { BenefitsSection } from "./BenefitsSection";
+import { ConversionSection } from "./ConversionSection";
+import { CTASection } from "./CTASection";
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -159,25 +161,11 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       {/* Benefits Section */}
       <BenefitsSection />
 
+      {/* Conversion Section */}
+      <ConversionSection />
+
       {/* CTA Section */}
-      <section className="container mx-auto px-4 py-16 text-center">
-        <div className="max-w-2xl mx-auto">
-          <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Ready to Get Started?
-          </h3>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Join thousands of developers who use JSONcel to work with JSON data
-            efficiently.
-          </p>
-          <Button
-            size="lg"
-            onClick={onGetStarted}
-            className="text-lg px-8 py-3"
-          >
-            Start Editing Now
-          </Button>
-        </div>
-      </section>
+      <CTASection onGetStarted={onGetStarted} />
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 border-t border-gray-200 dark:border-gray-700">
