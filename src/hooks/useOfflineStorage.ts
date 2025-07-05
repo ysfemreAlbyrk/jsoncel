@@ -20,12 +20,17 @@ export function useOfflineStorage() {
     }
   };
 
-  const createProject = async (name: string, data: any[] = []) => {
+  const createProject = async (
+    name: string,
+    data: any[] = [],
+    description?: string
+  ) => {
     try {
       const project: Project = {
         id: `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         name,
         data,
+        description,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -68,6 +73,27 @@ export function useOfflineStorage() {
     }
   };
 
+  const renameProject = async (projectId: string, newName: string) => {
+    try {
+      const project = storageManager.loadProject(projectId);
+      if (!project) {
+        throw new Error("Project not found");
+      }
+
+      const updatedProject: Project = {
+        ...project,
+        name: newName,
+        updatedAt: new Date(),
+      };
+
+      storageManager.saveProject(updatedProject);
+      await loadProjects();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to rename project");
+      throw err;
+    }
+  };
+
   const getStorageInfo = () => {
     return storageManager.getStorageInfo();
   };
@@ -84,6 +110,7 @@ export function useOfflineStorage() {
     deleteProject,
     loadProject,
     saveProject,
+    renameProject,
     loadProjects,
     getStorageInfo,
   };

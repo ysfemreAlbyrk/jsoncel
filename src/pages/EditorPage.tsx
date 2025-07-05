@@ -1,35 +1,45 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Header } from "../components/shared/Header";
 import { Footer } from "../components/shared/Footer";
 import { JsonGrid } from "../components/editor/JsonGrid";
 import { FileUpload } from "../components/editor/FileUpload";
+import { ProjectManager } from "../components/editor/ProjectManager";
 import { Modal } from "../components/ui/Modal";
+import { Button } from "../components/ui/Button";
 import { useJsonData } from "../hooks/useJsonData";
 import { useAutoSave } from "../hooks/useAutoSave";
 import { useOfflineStorage } from "../hooks/useOfflineStorage";
 import { ToastContainer, toast } from "../components/ui/ToastContainer";
 import { OfflineIndicator } from "../components/shared/OfflineIndicator";
 import { ErrorBoundary } from "../components/shared/ErrorBoundary";
+import { FolderOpen, X } from "lucide-react";
 import type { JsonArray } from "../types";
 
 export function EditorPage() {
   const [projectName, setProjectName] = useState("Untitled Project");
-  const [projectId, setProjectId] = useState(`project-${Date.now()}`);
+  const [projectId, setProjectId] = useState<string | undefined>(undefined);
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
+  const [isProjectManagerOpen, setIsProjectManagerOpen] = useState(false);
   const { data, setData } = useJsonData([
     { name: "John Doe", age: 30, city: "New York", active: true },
     { name: "Jane Smith", age: 25, city: "Los Angeles", active: false },
     { name: "Bob Johnson", age: 35, city: "Chicago", active: true },
   ]);
-  const { projects, createProject, saveProject, loadProject } =
-    useOfflineStorage();
+  const {
+    projects,
+    createProject,
+    saveProject,
+    loadProject,
+    deleteProject,
+    renameProject,
+  } = useOfflineStorage();
 
   // Auto-save functionality
   useAutoSave({
     data,
-    projectId,
+    projectId: projectId || `temp-${Date.now()}`,
     projectName,
-    enabled: true,
+    enabled: !!projectId,
     interval: 5000,
   });
 
@@ -37,21 +47,74 @@ export function EditorPage() {
     setData(newData);
   };
 
-  const handleNewProject = () => {
+  const handleNewProject = async () => {
     const newProjectName = `Project ${Date.now()}`;
-    const newProjectId = `project-${Date.now()}`;
-    setProjectName(newProjectName);
-    setProjectId(newProjectId);
-    setData([]);
-    createProject(newProjectName);
+    try {
+      const newProjectId = await createProject(newProjectName, []);
+      setProjectName(newProjectName);
+      setProjectId(newProjectId);
+      setData([]);
+      toast.success(`Project "${newProjectName}" created`);
+    } catch (error) {
+      toast.error("Failed to create project");
+    }
   };
 
-  const handleLoadProject = async (name: string) => {
-    const projectData = await loadProject(name);
-    if (projectData) {
+  const handleProjectSelect = async (selectedProjectId: string) => {
+    try {
+      const projectData = await loadProject(selectedProjectId);
+      if (projectData) {
+        setProjectName(projectData.name);
+        setProjectId(projectData.id);
+        setData(projectData.data || []);
+        setIsProjectManagerOpen(false);
+      }
+    } catch (error) {
+      toast.error("Failed to load project");
+    }
+  };
+
+  const handleProjectCreate = async (name: string, description?: string) => {
+    try {
+      const newProjectId = await createProject(name, [], description);
       setProjectName(name);
-      setProjectId(projectData.id || `project-${Date.now()}`);
-      setData(projectData.data || []);
+      setProjectId(newProjectId);
+      setData([]);
+    } catch (error) {
+      throw error; // Re-throw to let ProjectManager handle it
+    }
+  };
+
+  const handleProjectDelete = async (projectIdToDelete: string) => {
+    try {
+      await deleteProject(projectIdToDelete);
+      // If we deleted the current project, reset to default
+      if (projectIdToDelete === projectId) {
+        setProjectName("Untitled Project");
+        setProjectId(undefined);
+        setData([
+          { name: "John Doe", age: 30, city: "New York", active: true },
+          { name: "Jane Smith", age: 25, city: "Los Angeles", active: false },
+          { name: "Bob Johnson", age: 35, city: "Chicago", active: true },
+        ]);
+      }
+    } catch (error) {
+      throw error; // Re-throw to let ProjectManager handle it
+    }
+  };
+
+  const handleProjectRename = async (
+    projectIdToRename: string,
+    newName: string
+  ) => {
+    try {
+      await renameProject(projectIdToRename, newName);
+      // If we renamed the current project, update the name
+      if (projectIdToRename === projectId) {
+        setProjectName(newName);
+      }
+    } catch (error) {
+      throw error; // Re-throw to let ProjectManager handle it
     }
   };
 
@@ -76,7 +139,7 @@ export function EditorPage() {
   };
 
   const handleSettings = () => {
-    console.log("Settings functionality");
+    setIsProjectManagerOpen(true);
   };
 
   return (
@@ -89,6 +152,21 @@ export function EditorPage() {
           onImport={handleImport}
           onSettings={handleSettings}
         />
+
+        {/* Project Manager Button */}
+        <div className="container mx-auto px-4 py-2">
+          <div className="max-w-7xl mx-auto">
+            <Button
+              onClick={() => setIsProjectManagerOpen(true)}
+              variant="outline"
+              size="sm"
+              className="flex items-center space-x-2"
+            >
+              <FolderOpen className="w-4 h-4" />
+              <span>Projects ({projects.length})</span>
+            </Button>
+          </div>
+        </div>
 
         {/* Main Content */}
         <main className="flex-1 container mx-auto px-4 py-6">
@@ -122,6 +200,25 @@ export function EditorPage() {
             maxFileSize={10}
             className="max-w-lg mx-auto"
           />
+        </Modal>
+
+        {/* Project Manager Modal */}
+        <Modal
+          isOpen={isProjectManagerOpen}
+          onClose={() => setIsProjectManagerOpen(false)}
+          title="Project Manager"
+          className="max-w-4xl"
+        >
+          <div className="h-[600px]">
+            <ProjectManager
+              projects={projects}
+              currentProjectId={projectId}
+              onProjectSelect={handleProjectSelect}
+              onProjectCreate={handleProjectCreate}
+              onProjectDelete={handleProjectDelete}
+              onProjectRename={handleProjectRename}
+            />
+          </div>
         </Modal>
       </div>
     </ErrorBoundary>
