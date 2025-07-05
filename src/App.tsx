@@ -5,9 +5,12 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
 import { LandingPage } from "./components/landing/LandingPage";
 import { JsonEditor } from "./components/editor/JsonEditor";
+import { Header } from "./components/shared/Header";
+import { ToastContainer } from "./components/ui/ToastContainer";
+import { OfflineIndicator } from "./components/shared/OfflineIndicator";
+import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { useJsonData } from "./hooks/useJsonData";
 import { useTheme } from "./hooks/useTheme";
 
@@ -20,26 +23,32 @@ function App() {
   };
 
   return (
-    <Router>
-      <div className={`min-h-screen ${theme}`}>
-        <Routes>
-          <Route
-            path="/"
-            element={<LandingPage onGetStarted={handleGetStarted} />}
-          />
-          <Route
-            path="/editor"
-            element={
-              <div className="h-screen p-4">
-                <JsonEditor data={data} onChange={setData} />
-              </div>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <Toaster position="top-right" />
-      </div>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <div className={`min-h-screen ${theme}`}>
+          <Routes>
+            <Route
+              path="/"
+              element={<LandingPage onGetStarted={handleGetStarted} />}
+            />
+            <Route
+              path="/editor"
+              element={
+                <div className="h-screen flex flex-col">
+                  <Header projectName="Untitled Project" />
+                  <div className="flex-1 p-4">
+                    <JsonEditor data={data} onChange={setData} />
+                  </div>
+                </div>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <ToastContainer />
+          <OfflineIndicator />
+        </div>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

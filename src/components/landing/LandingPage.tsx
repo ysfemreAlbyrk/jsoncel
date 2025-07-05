@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "../ui/Card";
 import { ThemeToggle } from "../shared/ThemeToggle";
+import { BenefitsSection } from "./BenefitsSection";
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -154,6 +155,9 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           </Card>
         </div>
       </section>
+
+      {/* Benefits Section */}
+      <BenefitsSection />
 
       {/* CTA Section */}
       <section className="container mx-auto px-4 py-16 text-center">
