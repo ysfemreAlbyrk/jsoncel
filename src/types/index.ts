@@ -13,7 +13,7 @@ export interface JsonData {
 
 export type JsonArray = JsonData[];
 
-// Grid Types
+// Grid Types - Types for data grid components
 export interface GridColumn {
   id: string;
   title: string;
