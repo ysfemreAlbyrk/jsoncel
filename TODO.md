@@ -87,19 +87,19 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 
 ### 5.1 Hero Section
 
-- [ ] Hero component'ini oluştur
-- [ ] Ana başlık ve alt başlık ekle
-- [ ] CTA button'unu implement et
-- [ ] Hero animasyonlarını ekle
-- [ ] Responsive tasarımı tamamla
+- [x] Hero component'ini oluştur
+- [x] Ana başlık ve alt başlık ekle
+- [x] CTA button'unu implement et
+- [x] Hero animasyonlarını ekle
+- [x] Responsive tasarımı tamamla
 
 ### 5.2 Features Section
 
-- [ ] Features component'ini oluştur
-- [ ] 3 ana özellik kartını tasarla
-- [ ] Her kart için ikon ve açıklama ekle
-- [ ] Hover animasyonlarını implement et
-- [ ] Grid layout'unu responsive yap
+- [x] Features component'ini oluştur
+- [x] 3 ana özellik kartını tasarla
+- [x] Her kart için ikon ve açıklama ekle
+- [x] Hover animasyonlarını implement et
+- [x] Grid layout'unu responsive yap
 
 ### 5.3 Benefits Section
 
@@ -179,15 +179,15 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 
 ### 7.1 Router Setup
 
-- [ ] React Router'ı App.tsx'te kur
-- [ ] Landing page route'unu tanımla
-- [ ] Editor page route'unu tanımla
+- [x] React Router'ı App.tsx'te kur
+- [x] Landing page route'unu tanımla
+- [x] Editor page route'unu tanımla
 - [ ] 404 error page'i ekle
 - [ ] Route transitions'ları implement et
 
 ### 7.2 Navigation Logic
 
-- [ ] Landing'den Editor'e geçiş logic'ini yaz
+- [x] Landing'den Editor'e geçiş logic'ini yaz
 - [ ] Deep linking desteği ekle
 - [ ] Browser history management'i implement et
 - [ ] URL parameter handling'i ekle
