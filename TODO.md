@@ -69,17 +69,17 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 
 ### 4.1 Temel UI Components
 
-- [ ] Button component'ini oluştur
-- [ ] Card component'ini geliştir
-- [ ] Modal component'ini yaz
+- [x] Button component'ini oluştur
+- [x] Card component'ini geliştir
+- [x] Modal component'ini yaz
 - [ ] Toast notification system'ini kur
-- [ ] Loading spinner component'ini ekle
+- [x] Loading spinner component'ini ekle
 
 ### 4.2 Shared Components
 
 - [ ] Header component'ini oluştur
 - [ ] Footer component'ini geliştir
-- [ ] ThemeToggle component'ini yaz
+- [x] ThemeToggle component'ini yaz
 - [ ] OfflineIndicator component'ini ekle
 - [ ] Error boundary component'ini implement et
 
