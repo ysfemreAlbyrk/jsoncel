@@ -41,11 +41,11 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 
 ### 2.2 Utility Fonksiyonları
 
-- [ ] JSON parser utility'lerini yaz
-- [ ] Grid helper fonksiyonlarını oluştur
-- [ ] File handler fonksiyonlarını geliştir
-- [ ] Storage manager utility'lerini yaz
-- [ ] Data validation fonksiyonlarını ekle
+- [x] JSON parser utility'lerini yaz
+- [x] Grid helper fonksiyonlarını oluştur
+- [x] File handler fonksiyonlarını geliştir
+- [x] Storage manager utility'lerini yaz
+- [x] Data validation fonksiyonlarını ekle
 
 ## 3. TEMEL HOOK'LAR VE STATE YÖNETİMİ
 
