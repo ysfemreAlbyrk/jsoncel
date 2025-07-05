@@ -7,6 +7,44 @@ import type {
 } from "../types";
 import { parseJson, formatJson } from "./jsonParser";
 
+// Standalone functions for FileUpload component
+export async function parseJsonFile(file: File): Promise<FileUploadResult> {
+  return FileHandler.importFromFile(file);
+}
+
+export function validateJsonData(data: JsonArray): {
+  isValid: boolean;
+  error?: string;
+} {
+  try {
+    if (!Array.isArray(data)) {
+      return { isValid: false, error: "Data must be an array" };
+    }
+
+    if (data.length === 0) {
+      return { isValid: true }; // Empty array is valid
+    }
+
+    // Check if all items are objects
+    for (let i = 0; i < data.length; i++) {
+      const item = data[i];
+      if (typeof item !== "object" || item === null || Array.isArray(item)) {
+        return {
+          isValid: false,
+          error: `Item at index ${i} must be an object`,
+        };
+      }
+    }
+
+    return { isValid: true };
+  } catch (error) {
+    return {
+      isValid: false,
+      error: error instanceof Error ? error.message : "Validation failed",
+    };
+  }
+}
+
 export class FileHandler {
   static async importFromFile(file: File): Promise<FileUploadResult> {
     return new Promise((resolve, reject) => {
