@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Header } from "../components/shared/Header";
 import { Footer } from "../components/shared/Footer";
-import { JsonEditor } from "../components/editor/JsonEditor";
+import { JsonGrid } from "../components/editor/JsonGrid";
 import { useJsonData } from "../hooks/useJsonData";
 import { useAutoSave } from "../hooks/useAutoSave";
 import { useOfflineStorage } from "../hooks/useOfflineStorage";
@@ -13,7 +13,11 @@ import type { JsonArray } from "../types";
 export function EditorPage() {
   const [projectName, setProjectName] = useState("Untitled Project");
   const [projectId, setProjectId] = useState(`project-${Date.now()}`);
-  const { data, setData } = useJsonData();
+  const { data, setData } = useJsonData([
+    { name: "John Doe", age: 30, city: "New York", active: true },
+    { name: "Jane Smith", age: 25, city: "Los Angeles", active: false },
+    { name: "Bob Johnson", age: 35, city: "Chicago", active: true },
+  ]);
   const { projects, createProject, saveProject, loadProject } =
     useOfflineStorage();
 
@@ -78,7 +82,7 @@ export function EditorPage() {
           <div className="max-w-7xl mx-auto">
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 h-[600px]">
               {/* Editor */}
-              <JsonEditor data={data} onChange={handleDataChange} />
+              <JsonGrid data={data} onChange={handleDataChange} />
             </div>
           </div>
         </main>
