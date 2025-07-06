@@ -11,6 +11,7 @@ import { LandingPage } from "./components/landing/LandingPage";
 import { EditorPage } from "./pages/EditorPage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+import { PWAInstallPrompt } from "./components/shared/PWAInstallPrompt";
 import { useTheme } from "./hooks/useTheme";
 
 // Page transition variants
@@ -93,6 +94,9 @@ function AnimatedRoutes() {
           <Route path="*" element={<Navigate to="/404" replace />} />
         </Routes>
       </AnimatePresence>
+
+      {/* PWA Install Prompt */}
+      <PWAInstallPrompt />
     </div>
   );
 }
