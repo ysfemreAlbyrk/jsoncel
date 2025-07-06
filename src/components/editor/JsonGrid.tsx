@@ -49,6 +49,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           data: "",
           displayData: "",
           allowOverlay: !readOnly,
+          readonly: readOnly,
         };
       }
 
@@ -63,12 +64,14 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
             data: Number(value) || 0,
             displayData: String(value),
             allowOverlay: !readOnly,
+            readonly: readOnly,
           };
         case "boolean":
           return {
             kind: GridCellKind.Boolean,
             data: Boolean(value),
             allowOverlay: false,
+            readonly: readOnly,
           };
         default:
           return {
@@ -76,6 +79,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
             data: String(value || ""),
             displayData: String(value || ""),
             allowOverlay: !readOnly,
+            readonly: readOnly,
           };
       }
     },
@@ -244,11 +248,26 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           rows={gridData.rows.length}
           onCellEdited={onCellEdited}
           onGridSelectionChange={onSelectionChanged}
+          // Enable editing
+          getCellsForSelection={true}
+          trailingRowOptions={{
+            hint: "New row...",
+            sticky: true,
+            tint: true,
+          }}
+          // Scrolling
           smoothScrollX={true}
           smoothScrollY={true}
+          // Sizing
           rowHeight={36}
           headerHeight={36}
+          // Row markers
           rowMarkers="both"
+          // Enable various interactions
+          isDraggable={false}
+          rangeSelect="rect"
+          columnSelect="single"
+          rowSelect="single"
           // Keyboard shortcuts
           keybindings={{
             selectAll: true,
