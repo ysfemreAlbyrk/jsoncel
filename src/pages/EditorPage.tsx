@@ -206,27 +206,17 @@ export function EditorPage() {
           onExport={handleExport}
           onImport={handleImport}
           onSettings={handleSettings}
+          onProjectsClick={() => setIsProjectManagerOpen(true)}
+          projectsCount={projects.length}
         />
 
         {/* Project Manager Button */}
-        <div className="container mx-auto px-4 py-2">
-          <div className="max-w-7xl mx-auto">
-            <Button
-              onClick={() => setIsProjectManagerOpen(true)}
-              variant="outline"
-              size="sm"
-              className="flex items-center space-x-2"
-            >
-              <FolderOpen className="w-4 h-4" />
-              <span>Projects ({projects.length})</span>
-            </Button>
-          </div>
-        </div>
+        {/* <div className="container mx-auto px-4 py-2"></div> */}
 
         {/* Main Content */}
-        <main className="flex-1 container mx-auto px-4 py-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 h-[600px] flex flex-col overflow-hidden">
+        <main className="flex-1 w-full">
+          <div className="w-full">
+            <div className="bg-white dark:bg-gray-800 shadow-sm w-full">
               {/* Editor */}
               <JsonGrid data={data} onChange={handleDataChange} />
             </div>
@@ -234,7 +224,7 @@ export function EditorPage() {
         </main>
 
         {/* Footer */}
-        <Footer />
+        {/* <Footer /> */}
 
         {/* Toast Notifications */}
         <ToastContainer />

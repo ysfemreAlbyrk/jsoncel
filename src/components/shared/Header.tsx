@@ -1,5 +1,5 @@
 import React from "react";
-import { FileText, Upload, Settings } from "lucide-react";
+import { FileText, Upload, Settings, FolderOpen } from "lucide-react";
 import { Button } from "../ui/Button";
 import { ThemeToggle } from "./ThemeToggle";
 import { ExportButton } from "../editor/ExportButton";
@@ -10,16 +10,20 @@ interface HeaderProps {
   onImport?: () => void;
   onExport?: () => void;
   onSettings?: () => void;
+  onProjectsClick?: () => void;
   projectName?: string;
   data?: JsonArray;
+  projectsCount?: number;
 }
 
 export function Header({
   onImport,
   onExport,
   onSettings,
+  onProjectsClick,
   projectName,
   data = [],
+  projectsCount = 0,
 }: HeaderProps) {
   const handleImport = () => {
     onImport?.();
@@ -27,6 +31,10 @@ export function Header({
 
   const handleSettings = () => {
     onSettings?.();
+  };
+
+  const handleProjectsClick = () => {
+    onProjectsClick?.();
   };
 
   return (
@@ -55,6 +63,15 @@ export function Header({
 
         {/* Actions */}
         <div className="flex items-center space-x-2">
+          <Button
+            onClick={handleProjectsClick}
+            variant="outline"
+            size="sm"
+            className="flex items-center space-x-2"
+          >
+            <FolderOpen className="w-4 h-4" />
+            <span>Projects ({projectsCount})</span>
+          </Button>
           <Button
             variant="ghost"
             size="sm"

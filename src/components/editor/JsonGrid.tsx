@@ -20,34 +20,92 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
   // Simple state for current data
   const [currentData, setCurrentData] = useState<JsonArray>(data);
 
+  // Column widths state
+  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+
+  // Container size state
+  const [containerSize, setContainerSize] = useState({
+    width: 1400,
+    height: 700,
+  });
+
+  // Virtual grid limits (like Excel)
+  const MAX_ROWS = 100000;
+  const MAX_COLS = 1000;
+  const MIN_VISIBLE_ROWS = 50;
+  const MIN_VISIBLE_COLS = 10;
+
   // Update current data when props change
   React.useEffect(() => {
     setCurrentData(data);
   }, [data]);
 
-  // Generate columns from data
-  const columns = useMemo((): GridColumn[] => {
-    if (currentData.length === 0) {
-      return [
-        { title: "Column 1", width: 150, id: "col1" },
-        { title: "Column 2", width: 150, id: "col2" },
-      ];
-    }
+  // Resize observer to track container size
+  React.useEffect(() => {
+    const updateSize = () => {
+      // Calculate available space (viewport minus header/toolbar/footer)
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
 
-    const firstRow = currentData[0];
-    return Object.keys(firstRow).map((key, index) => ({
+      // Reserve space for header (~60px), toolbar (~60px), footer (~40px), padding
+      const availableHeight = viewportHeight - 155;
+      const availableWidth = viewportWidth - 0; // Some padding
+
+      setContainerSize({
+        width: Math.max(availableWidth, 800), // Minimum 800px
+        height: Math.max(availableHeight, 400), // Minimum 400px
+      });
+    };
+
+    // Initial size
+    updateSize();
+
+    // Listen for window resize
+    window.addEventListener("resize", updateSize);
+
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
+
+  // Generate columns from data + virtual columns
+  const columns = useMemo((): GridColumn[] => {
+    // Get existing columns from data
+    const existingColumns = new Set<string>();
+    currentData.forEach((row) => {
+      Object.keys(row).forEach((key) => existingColumns.add(key));
+    });
+
+    const realColumns = Array.from(existingColumns).map((key) => ({
       title: key,
-      width: 150,
+      width: columnWidths[key] || 150,
       id: key,
     }));
-  }, [currentData]);
 
-  // Get cell content
+    // Add virtual columns to reach minimum or based on existing data
+    const totalColumns = Math.max(
+      realColumns.length + MIN_VISIBLE_COLS,
+      MIN_VISIBLE_COLS
+    );
+
+    const virtualColumns: GridColumn[] = [];
+    for (let i = realColumns.length; i < totalColumns && i < MAX_COLS; i++) {
+      const virtualId = `virtual_col_${i}`;
+      virtualColumns.push({
+        title: `Column ${i + 1}`,
+        width: columnWidths[virtualId] || 150,
+        id: virtualId,
+      });
+    }
+
+    return [...realColumns, ...virtualColumns];
+  }, [currentData, columnWidths, MIN_VISIBLE_COLS, MAX_COLS]);
+
+  // Get cell content (handles virtual cells)
   const getCellContent = useCallback(
     (cell: Item): GridCell => {
       const [col, row] = cell;
 
-      if (row >= currentData.length || col >= columns.length) {
+      // Check bounds
+      if (row >= MAX_ROWS || col >= columns.length) {
         return {
           kind: GridCellKind.Text,
           data: "",
@@ -57,7 +115,6 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
         };
       }
 
-      const rowData = currentData[row];
       const column = columns[col];
       if (!column) {
         return {
@@ -68,6 +125,9 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           readonly: readOnly,
         };
       }
+
+      // Get value from actual data or return empty for virtual cells
+      const rowData = currentData[row];
       const value = rowData?.[column.id as string];
 
       // Determine cell type and return appropriate GridCell
@@ -96,7 +156,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
         };
       }
     },
-    [currentData, columns]
+    [currentData, columns, readOnly, MAX_ROWS]
   );
 
   // Handle cell edits
@@ -138,17 +198,32 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           actualValue = newValue.data;
       }
 
-      // Update the data
+      // Update the data (extend array if needed for virtual rows)
       console.log("✅ Updating cell with value:", actualValue);
       const newData = [...currentData];
+
+      // Extend array if row doesn't exist yet
+      while (newData.length <= row) {
+        newData.push({});
+      }
+
       newData[row] = {
         ...newData[row],
         [column.id as string]: actualValue,
       };
 
       console.log("✅ New data:", newData);
-      setCurrentData(newData);
-      onChange(newData);
+
+      // Filter out completely empty rows before saving
+      const filteredData = newData.filter((row) => {
+        return Object.keys(row).some((key) => {
+          const value = row[key];
+          return value !== "" && value !== null && value !== undefined;
+        });
+      });
+
+      setCurrentData(newData); // Keep full data for editing
+      onChange(filteredData); // Only save non-empty rows to JSON
     },
     [currentData, columns, onChange, readOnly]
   );
@@ -167,6 +242,26 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
 
       // We'll implement the actual fill logic once we understand the event structure
       // This is a placeholder that will work for now
+    },
+    [readOnly]
+  );
+
+  // Handle column resize
+  const onColumnResize = useCallback(
+    (column: any, newSize: number, columnIndex: number) => {
+      console.log("🔄 Column resized:", column, newSize, columnIndex);
+      if (readOnly) {
+        console.log("❌ Read-only mode, ignoring resize");
+        return;
+      }
+
+      // Update column width
+      setColumnWidths((prev) => ({
+        ...prev,
+        [column.id]: newSize,
+      }));
+
+      console.log("✅ Column width updated:", column.id, newSize);
     },
     [readOnly]
   );
@@ -204,7 +299,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
   return (
     <div className="h-full w-full flex flex-col">
       {/* Toolbar */}
-      <div className="flex items-center gap-2 p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
+      <div className="flex w-full items-center gap-2 p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
         <button
           onClick={addRow}
           disabled={readOnly}
@@ -221,19 +316,23 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
         </button>
         <div className="flex-1" />
         <div className="text-sm text-gray-600 dark:text-gray-400">
-          {currentData.length} rows × {columns.length} columns
+          {Math.max(currentData.length + MIN_VISIBLE_ROWS, MIN_VISIBLE_ROWS)}{" "}
+          rows × {columns.length} columns
         </div>
       </div>
 
       {/* Grid */}
-      <div className="flex-1 min-h-0">
+      <div className="flex-1 w-full overflow-hidden">
         <DataEditor
           getCellContent={getCellContent}
           columns={columns}
-          rows={currentData.length}
+          rows={Math.max(
+            currentData.length + MIN_VISIBLE_ROWS,
+            MIN_VISIBLE_ROWS
+          )}
           onCellEdited={onCellEdited}
-          width={800}
-          height={400}
+          width={containerSize.width}
+          height={containerSize.height}
           smoothScrollX={true}
           smoothScrollY={true}
           rowHeight={36}
@@ -243,6 +342,13 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           fillHandle={true}
           onPaste={true}
           onFillPattern={onFillPattern}
+          // Enable column resizing
+          onColumnResize={onColumnResize}
+          maxColumnWidth={2000}
+          minColumnWidth={50}
+          maxColumnAutoWidth={500}
+          overscrollX={200}
+          overscrollY={200}
           keybindings={{
             selectAll: true,
             selectRow: true,
@@ -269,13 +375,29 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
             borderColor: "#e5e7eb",
             fontFamily:
               "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+            baseFontStyle: "0.8125rem",
+            headerFontStyle: "600 0.8125rem",
+            editorFontSize: "0.8125rem",
           }}
         />
       </div>
 
       {/* Footer */}
       <div className="p-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400 flex-shrink-0">
-        {currentData.length} rows × {columns.length} columns
+        {Math.max(currentData.length + MIN_VISIBLE_ROWS, MIN_VISIBLE_ROWS)} rows
+        × {columns.length} columns
+        <span className="ml-4 text-gray-500">
+          (
+          {
+            currentData.filter((row) =>
+              Object.keys(row).some((key) => {
+                const value = row[key];
+                return value !== "" && value !== null && value !== undefined;
+              })
+            ).length
+          }{" "}
+          filled rows)
+        </span>
       </div>
     </div>
   );
