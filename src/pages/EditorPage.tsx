@@ -226,7 +226,7 @@ export function EditorPage() {
         {/* Main Content */}
         <main className="flex-1 container mx-auto px-4 py-6">
           <div className="max-w-7xl mx-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 h-[600px]">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[600px] flex flex-col">
               {/* Editor */}
               <JsonGrid data={data} onChange={handleDataChange} />
             </div>
