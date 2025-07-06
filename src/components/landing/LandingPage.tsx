@@ -13,6 +13,8 @@ import { ThemeToggle } from "../shared/ThemeToggle";
 import { BenefitsSection } from "./BenefitsSection";
 import { ConversionSection } from "./ConversionSection";
 import { CTASection } from "./CTASection";
+import { ToolsSection } from "./ToolsSection";
+import { FAQSection } from "./FAQSection";
 
 interface LandingPageProps {
   onGetStarted: () => void;
@@ -183,6 +185,12 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
 
       {/* Conversion Section */}
       <ConversionSection />
+
+      {/* Tools Section */}
+      <ToolsSection />
+
+      {/* FAQ Section */}
+      <FAQSection />
 
       {/* CTA Section */}
       <CTASection onGetStarted={handleGetStarted} />
