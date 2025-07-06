@@ -15,21 +15,13 @@ import {
   Redo2,
   Search,
   Filter,
-  SortAsc,
-  SortDesc,
-  Eye,
   EyeOff,
   Plus,
   PlusCircle,
   RefreshCw,
   Trash2,
   CheckCircle,
-  AlertCircle,
-  Hash,
   Type,
-  Calendar,
-  Moon,
-  Sun,
 } from "lucide-react";
 import "@glideapps/glide-data-grid/dist/index.css";
 
@@ -46,7 +38,7 @@ interface HistoryState {
 
 export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
   // Theme hook
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
 
   // Simple state for current data
   const [currentData, setCurrentData] = useState<JsonArray>(data);
@@ -164,9 +156,29 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
     };
   }, [showSearch]);
 
+  // Force grid re-render when theme changes
+  const [gridKey, setGridKey] = useState(0);
+
+  React.useEffect(() => {
+    console.log("🎯 Theme changed in grid, forcing complete re-render:", theme);
+    // Force complete remount of DataEditor and container
+    setGridKey((prev) => prev + 1);
+
+    // Additional delay to ensure DOM updates
+    setTimeout(() => {
+      setGridKey((prev) => prev + 1);
+    }, 100);
+
+    // Force a final update after theme CSS has been applied
+    setTimeout(() => {
+      setGridKey((prev) => prev + 1);
+    }, 200);
+  }, [theme]);
+
   // Grid theme based on app theme
   const gridTheme = useMemo((): Partial<Theme> => {
     const isDark = theme === "dark";
+    console.log("🎯 Grid theme update - theme:", theme, "isDark:", isDark);
 
     return {
       accentColor: "#3b82f6",
@@ -198,7 +210,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
       editorFontSize: "0.8125rem",
       lineHeight: 1.4,
     };
-  }, [theme]);
+  }, [theme, gridKey]);
 
   // Add to history
   const addToHistory = useCallback(
@@ -808,17 +820,6 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
         {/* Theme & Utilities */}
         <div className="flex items-center gap-2">
           <button
-            onClick={toggleTheme}
-            className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-          >
-            {theme === "dark" ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
-            )}
-            {theme === "dark" ? "Light" : "Dark"}
-          </button>
-          <button
             onClick={handleRefresh}
             className="flex items-center gap-1 px-3 py-1 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
           >
@@ -876,11 +877,13 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
 
       {/* Grid */}
       <div
+        key={`grid-container-${theme}-${gridKey}`}
         className="flex-1 w-full overflow-hidden"
         tabIndex={0}
         onFocus={() => console.log("Grid container focused")}
       >
         <DataEditor
+          key={`grid-${theme}-${gridKey}`}
           getCellContent={getCellContent}
           columns={columns}
           rows={Math.max(
