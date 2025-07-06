@@ -197,7 +197,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
   return (
     <div className="h-full w-full flex flex-col">
       {/* Toolbar */}
-      <div className="flex items-center gap-2 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="flex items-center gap-2 p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
         <button
           onClick={addRow}
           disabled={readOnly}
@@ -237,7 +237,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
       </div>
 
       {/* Grid */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-hidden">
         <DataEditor
           getCellContent={getCellContent}
           columns={columns}
@@ -297,7 +297,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
       </div>
 
       {/* Footer */}
-      <div className="p-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400">
+      <div className="p-2 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400 flex-shrink-0">
         {gridData.rows.length} rows × {gridData.columns.length} columns
         {selection.rows.length > 0 && (
           <span className="ml-4">
