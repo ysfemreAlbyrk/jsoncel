@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Header } from "../components/shared/Header";
 import { Footer } from "../components/shared/Footer";
 import { JsonGrid } from "../components/editor/JsonGrid";
@@ -17,6 +18,8 @@ import { FolderOpen, X } from "lucide-react";
 import type { JsonArray } from "../types";
 
 export function EditorPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [projectName, setProjectName] = useState("Untitled Project");
   const [projectId, setProjectId] = useState<string | undefined>(undefined);
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
@@ -34,6 +37,50 @@ export function EditorPage() {
     deleteProject,
     renameProject,
   } = useOfflineStorage();
+
+  // Handle URL parameters and deep linking
+  useEffect(() => {
+    const projectParam = searchParams.get("project");
+    const actionParam = searchParams.get("action");
+
+    if (projectParam && projectParam !== projectId) {
+      // Load project from URL parameter
+      handleProjectSelect(projectParam);
+    }
+
+    if (actionParam === "upload") {
+      setIsFileUploadOpen(true);
+      // Clean up URL parameter
+      setSearchParams((params) => {
+        params.delete("action");
+        return params;
+      });
+    }
+
+    if (actionParam === "projects") {
+      setIsProjectManagerOpen(true);
+      // Clean up URL parameter
+      setSearchParams((params) => {
+        params.delete("action");
+        return params;
+      });
+    }
+  }, [searchParams, projectId, setSearchParams]);
+
+  // Update URL when project changes
+  useEffect(() => {
+    if (projectId) {
+      setSearchParams((params) => {
+        params.set("project", projectId);
+        return params;
+      });
+    } else {
+      setSearchParams((params) => {
+        params.delete("project");
+        return params;
+      });
+    }
+  }, [projectId, setSearchParams]);
 
   // Auto-save functionality
   useAutoSave({
@@ -69,6 +116,9 @@ export function EditorPage() {
         setProjectId(projectData.id);
         setData(projectData.data || []);
         setIsProjectManagerOpen(false);
+
+        // Update browser history
+        navigate(`/editor?project=${projectData.id}`, { replace: false });
       }
     } catch (error) {
       toast.error("Failed to load project");
@@ -81,6 +131,9 @@ export function EditorPage() {
       setProjectName(name);
       setProjectId(newProjectId);
       setData([]);
+
+      // Update browser history
+      navigate(`/editor?project=${newProjectId}`, { replace: false });
     } catch (error) {
       throw error; // Re-throw to let ProjectManager handle it
     }

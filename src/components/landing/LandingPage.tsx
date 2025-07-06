@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Upload, FileText, Edit3, Download, Zap, Shield } from "lucide-react";
 import { Button } from "../ui/Button";
 import {
@@ -18,6 +19,20 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onGetStarted }: LandingPageProps) {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate("/editor");
+  };
+
+  const handleUploadAction = () => {
+    navigate("/editor?action=upload");
+  };
+
+  const handleProjectsAction = () => {
+    navigate("/editor?action=projects");
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
@@ -53,13 +68,18 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="text-lg px-8 py-3"
             >
               Get Started Free
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3">
-              View Demo
+            <Button
+              variant="outline"
+              size="lg"
+              className="text-lg px-8 py-3"
+              onClick={handleUploadAction}
+            >
+              Upload File
             </Button>
           </div>
         </div>
@@ -165,7 +185,7 @@ export function LandingPage({ onGetStarted }: LandingPageProps) {
       <ConversionSection />
 
       {/* CTA Section */}
-      <CTASection onGetStarted={onGetStarted} />
+      <CTASection onGetStarted={handleGetStarted} />
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 border-t border-gray-200 dark:border-gray-700">

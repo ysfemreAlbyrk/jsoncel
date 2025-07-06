@@ -4,13 +4,40 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { LandingPage } from "./components/landing/LandingPage";
 import { EditorPage } from "./pages/EditorPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
 import { useTheme } from "./hooks/useTheme";
 
-function App() {
+// Page transition variants
+const pageVariants = {
+  initial: {
+    opacity: 0,
+    y: 20,
+  },
+  in: {
+    opacity: 1,
+    y: 0,
+  },
+  out: {
+    opacity: 0,
+    y: -20,
+  },
+};
+
+const pageTransition = {
+  type: "tween" as const,
+  ease: "anticipate" as const,
+  duration: 0.3,
+};
+
+// Animated Routes component
+function AnimatedRoutes() {
+  const location = useLocation();
   const { theme } = useTheme();
 
   const handleGetStarted = () => {
@@ -18,18 +45,63 @@ function App() {
   };
 
   return (
+    <div className={`min-h-screen ${theme}`}>
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
+          <Route
+            path="/"
+            element={
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <LandingPage onGetStarted={handleGetStarted} />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/editor"
+            element={
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <EditorPage />
+              </motion.div>
+            }
+          />
+          <Route
+            path="/404"
+            element={
+              <motion.div
+                initial="initial"
+                animate="in"
+                exit="out"
+                variants={pageVariants}
+                transition={pageTransition}
+              >
+                <NotFoundPage />
+              </motion.div>
+            }
+          />
+          <Route path="*" element={<Navigate to="/404" replace />} />
+        </Routes>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function App() {
+  return (
     <ErrorBoundary>
       <Router>
-        <div className={`min-h-screen ${theme}`}>
-          <Routes>
-            <Route
-              path="/"
-              element={<LandingPage onGetStarted={handleGetStarted} />}
-            />
-            <Route path="/editor" element={<EditorPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </div>
+        <AnimatedRoutes />
       </Router>
     </ErrorBoundary>
   );

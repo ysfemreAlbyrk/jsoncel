@@ -203,22 +203,22 @@ Bu PRD'yi analiz ederek, JSONcel projesini adım adım geliştirmek için detayl
 - [x] Excel export özelliğini ekle
 - [x] File download functionality'sini implement et
 
-## 7. ROUTING VE NAVİGASYON
+## 7. ROUTING VE NAVİGASYON ✅
 
 ### 7.1 Router Setup
 
 - [x] React Router'ı App.tsx'te kur
 - [x] Landing page route'unu tanımla
 - [x] Editor page route'unu tanımla
-- [ ] 404 error page'i ekle
-- [ ] Route transitions'ları implement et
+- [x] 404 error page'i ekle
+- [x] Route transitions'ları implement et
 
 ### 7.2 Navigation Logic
 
 - [x] Landing'den Editor'e geçiş logic'ini yaz
-- [ ] Deep linking desteği ekle
-- [ ] Browser history management'i implement et
-- [ ] URL parameter handling'i ekle
+- [x] Deep linking desteği ekle
+- [x] Browser history management'i implement et
+- [x] URL parameter handling'i ekle
 
 ## 8. PWA ÖZELLİKLERİ
 
