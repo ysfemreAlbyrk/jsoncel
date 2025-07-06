@@ -57,4 +57,40 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          vendor: ["react", "react-dom"],
+          router: ["react-router-dom"],
+          ui: ["framer-motion", "lucide-react"],
+          grid: ["@glideapps/glide-data-grid"],
+          // Utility chunks
+          utils: ["file-saver", "react-hot-toast"],
+        },
+      },
+    },
+    // Optimize chunk size
+    chunkSizeWarningLimit: 1000,
+    // Enable source maps for production debugging
+    sourcemap: false,
+    // Minimize CSS
+    cssCodeSplit: true,
+    // Target modern browsers
+    target: "es2015",
+  },
+  // Optimize dependencies
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-router-dom",
+      "framer-motion",
+      "lucide-react",
+      "@glideapps/glide-data-grid",
+      "file-saver",
+      "react-hot-toast",
+    ],
+  },
 });

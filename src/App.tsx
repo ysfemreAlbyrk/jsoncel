@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,12 +7,28 @@ import {
   useLocation,
 } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { LandingPage } from "./components/landing/LandingPage";
-import { EditorPage } from "./pages/EditorPage";
-import { NotFoundPage } from "./pages/NotFoundPage";
 import { ErrorBoundary } from "./components/shared/ErrorBoundary";
+import { GlobalErrorBoundary } from "./components/shared/GlobalErrorBoundary";
 import { PWAInstallPrompt } from "./components/shared/PWAInstallPrompt";
+import { LoadingSpinner } from "./components/ui/LoadingSpinner";
 import { useTheme } from "./hooks/useTheme";
+
+// Lazy load components for code splitting
+const LandingPage = React.lazy(() =>
+  import("./components/landing/LandingPage").then((module) => ({
+    default: module.LandingPage,
+  }))
+);
+const EditorPage = React.lazy(() =>
+  import("./pages/EditorPage").then((module) => ({
+    default: module.EditorPage,
+  }))
+);
+const NotFoundPage = React.lazy(() =>
+  import("./pages/NotFoundPage").then((module) => ({
+    default: module.NotFoundPage,
+  }))
+);
 
 // Page transition variants
 const pageVariants = {
@@ -48,51 +64,59 @@ function AnimatedRoutes() {
   return (
     <div className={`min-h-screen ${theme}`}>
       <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route
-            path="/"
-            element={
-              <motion.div
-                initial="initial"
-                animate="in"
-                exit="out"
-                variants={pageVariants}
-                transition={pageTransition}
-              >
-                <LandingPage onGetStarted={handleGetStarted} />
-              </motion.div>
-            }
-          />
-          <Route
-            path="/editor"
-            element={
-              <motion.div
-                initial="initial"
-                animate="in"
-                exit="out"
-                variants={pageVariants}
-                transition={pageTransition}
-              >
-                <EditorPage />
-              </motion.div>
-            }
-          />
-          <Route
-            path="/404"
-            element={
-              <motion.div
-                initial="initial"
-                animate="in"
-                exit="out"
-                variants={pageVariants}
-                transition={pageTransition}
-              >
-                <NotFoundPage />
-              </motion.div>
-            }
-          />
-          <Route path="*" element={<Navigate to="/404" replace />} />
-        </Routes>
+        <Suspense
+          fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <LoadingSpinner size="lg" />
+            </div>
+          }
+        >
+          <Routes location={location} key={location.pathname}>
+            <Route
+              path="/"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                >
+                  <LandingPage onGetStarted={handleGetStarted} />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/editor"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                >
+                  <EditorPage />
+                </motion.div>
+              }
+            />
+            <Route
+              path="/404"
+              element={
+                <motion.div
+                  initial="initial"
+                  animate="in"
+                  exit="out"
+                  variants={pageVariants}
+                  transition={pageTransition}
+                >
+                  <NotFoundPage />
+                </motion.div>
+              }
+            />
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Routes>
+        </Suspense>
       </AnimatePresence>
 
       {/* PWA Install Prompt */}
@@ -103,11 +127,13 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <Router>
-        <AnimatedRoutes />
-      </Router>
-    </ErrorBoundary>
+    <GlobalErrorBoundary>
+      <ErrorBoundary>
+        <Router>
+          <AnimatedRoutes />
+        </Router>
+      </ErrorBoundary>
+    </GlobalErrorBoundary>
   );
 }
 
