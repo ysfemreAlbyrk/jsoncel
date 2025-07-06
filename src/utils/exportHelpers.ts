@@ -151,50 +151,11 @@ export async function exportToExcelAdvanced(
   data: JsonArray,
   filename: string
 ): Promise<void> {
-  try {
-    // Dynamic import to avoid bundling if not used
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore - XLSX is optional dependency
-    const XLSX = await import("xlsx");
-
-    if (!data || data.length === 0) {
-      throw new Error("No data to export");
-    }
-
-    // Create workbook and worksheet
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(data);
-
-    // Add worksheet to workbook
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-
-    // Generate Excel file
-    const excelBuffer = XLSX.write(workbook, {
-      bookType: "xlsx",
-      type: "array",
-    });
-    const blob = new Blob([excelBuffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-
-    saveAs(blob, `${filename}.xlsx`);
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message.includes("Cannot resolve module")
-    ) {
-      // Fallback to basic Excel export if XLSX is not available
-      console.warn(
-        "XLSX library not available, falling back to basic Excel export"
-      );
-      return exportToExcel(data, filename);
-    }
-    throw new Error(
-      `Failed to export Excel: ${
-        error instanceof Error ? error.message : "Unknown error"
-      }`
-    );
-  }
+  // Fallback to basic Excel export since XLSX is not installed
+  console.warn(
+    "XLSX library not available, falling back to basic Excel export"
+  );
+  return exportToExcel(data, filename);
 }
 
 /**
