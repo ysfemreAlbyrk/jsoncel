@@ -48,7 +48,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           kind: GridCellKind.Text,
           data: "",
           displayData: "",
-          allowOverlay: true,
+          allowOverlay: !readOnly,
         };
       }
 
@@ -62,7 +62,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
             kind: GridCellKind.Number,
             data: Number(value) || 0,
             displayData: String(value),
-            allowOverlay: true,
+            allowOverlay: !readOnly,
           };
         case "boolean":
           return {
@@ -75,7 +75,7 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
             kind: GridCellKind.Text,
             data: String(value || ""),
             displayData: String(value || ""),
-            allowOverlay: true,
+            allowOverlay: !readOnly,
           };
       }
     },
@@ -197,38 +197,44 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
   return (
     <div className="h-full w-full flex flex-col">
       {/* Toolbar */}
-      {!readOnly && (
-        <div className="flex items-center gap-2 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+      <div className="flex items-center gap-2 p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <button
+          onClick={addRow}
+          disabled={readOnly}
+          className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add Row
+        </button>
+        <button
+          onClick={addColumn}
+          disabled={readOnly}
+          className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Add Column
+        </button>
+        {selection.rows.length > 0 && (
           <button
-            onClick={addRow}
-            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            onClick={removeSelectedRows}
+            disabled={readOnly}
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Row
+            Remove Rows ({selection.rows.length})
           </button>
+        )}
+        {selection.columns.length > 0 && (
           <button
-            onClick={addColumn}
-            className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+            onClick={removeSelectedColumns}
+            disabled={readOnly}
+            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Add Column
+            Remove Columns ({selection.columns.length})
           </button>
-          {selection.rows.length > 0 && (
-            <button
-              onClick={removeSelectedRows}
-              className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              Remove Rows ({selection.rows.length})
-            </button>
-          )}
-          {selection.columns.length > 0 && (
-            <button
-              onClick={removeSelectedColumns}
-              className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              Remove Columns ({selection.columns.length})
-            </button>
-          )}
+        )}
+        <div className="flex-1" />
+        <div className="text-sm text-gray-600 dark:text-gray-400">
+          {gridData.rows.length} rows × {gridData.columns.length} columns
         </div>
-      )}
+      </div>
 
       {/* Grid */}
       <div className="flex-1 overflow-hidden">
@@ -237,12 +243,13 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
           columns={columns}
           rows={gridData.rows.length}
           onCellEdited={onCellEdited}
+          onGridSelectionChange={onSelectionChanged}
           smoothScrollX={true}
           smoothScrollY={true}
           rowHeight={36}
           headerHeight={36}
           rowMarkers="both"
-          onGridSelectionChange={onSelectionChanged}
+          // Keyboard shortcuts
           keybindings={{
             selectAll: true,
             selectRow: true,
