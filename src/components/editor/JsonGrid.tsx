@@ -541,87 +541,63 @@ export function JsonGrid({ data, onChange, readOnly = false }: JsonGridProps) {
     [currentData, columns, onChange, readOnly, addToHistory]
   );
 
-  // Handle fill pattern using data ref approach like your example
-  const dataRef = React.useRef<any[][]>([[]]);
-
-  // Update data ref when currentData changes
-  React.useEffect(() => {
-    const newDataRef: any[][] = [];
-    columns.forEach((col, colIndex) => {
-      newDataRef[colIndex] = [];
-      currentData.forEach((row, rowIndex) => {
-        newDataRef[colIndex][rowIndex] = row[col.id as string] ?? "";
-      });
-    });
-    dataRef.current = newDataRef;
-  }, [currentData, columns]);
-
   const onFillPattern = useCallback(
-    (event: any) => {
-      console.log("🔥 Fill pattern triggered with event:", event);
+    (args: FillPatternEventArgs) => {
+      if (readOnly) return;
 
-      // Try to extract cell and value from the event
-      let cell, newVal;
+      console.log("🔥 Fill pattern triggered:", args);
 
-      // Different possible event structures
-      if (Array.isArray(event) && event.length >= 2) {
-        cell = [event[0], event[1]];
-        newVal = event[2] || { kind: GridCellKind.Text, data: "" };
-      } else if (event.cell && event.value) {
-        cell = event.cell;
-        newVal = event.value;
-      } else {
-        console.log("❌ Could not parse fill pattern event");
-        return;
-      }
-
-      const [col, row] = cell;
-      console.log("Processing fill for cell:", [col, row]);
-
-      if (dataRef.current?.[col] == null) {
-        dataRef.current[col] = [];
-      }
-
-      let value = "";
-      if (newVal.kind === GridCellKind.Text) {
-        value = newVal.data ?? "";
-      } else if (newVal.kind === GridCellKind.Number) {
-        value = newVal.data ?? "";
-      } else {
-        value = newVal.data ?? "";
-      }
-
-      dataRef.current[col][row] = value;
-
-      // Convert back to our data format
       const newData = [...currentData];
-      while (newData.length <= row) {
-        newData.push({});
-      }
+      let changed = false;
 
-      if (col < columns.length) {
+      const pattern = args.pattern;
+      if (pattern.length === 0) return;
+
+      args.cells.forEach((item, index) => {
+        const [col, row] = item;
         const column = columns[col];
-        if (column) {
+
+        if (!column) return;
+
+        const patternCell = pattern[index % pattern.length];
+
+        let actualValue: any;
+        switch (patternCell.kind) {
+          case GridCellKind.Text:
+          case GridCellKind.Number:
+          case GridCellKind.Boolean:
+            actualValue = patternCell.data;
+            break;
+          default:
+            actualValue = (patternCell as any).data;
+        }
+
+        while (newData.length <= row) {
+          newData.push({});
+        }
+
+        if (newData[row][column.id as string] !== actualValue) {
           newData[row] = {
             ...newData[row],
-            [column.id as string]: value,
+            [column.id as string]: actualValue,
           };
+          changed = true;
         }
-      }
-
-      // Filter out completely empty rows before saving
-      const filteredData = newData.filter((row) => {
-        return Object.keys(row).some((key) => {
-          const value = row[key];
-          return value !== "" && value !== null && value !== undefined;
-        });
       });
 
-      setCurrentData(newData);
-      onChange(filteredData);
-      addToHistory(filteredData);
+      if (changed) {
+        console.log("✅ Applying fill pattern changes");
+
+        const filteredData = newData.filter((row) =>
+          Object.values(row).some((v) => v !== null && v !== undefined && v !== "")
+        );
+
+        setCurrentData(newData);
+        onChange(filteredData);
+        addToHistory(filteredData);
+      }
     },
-    [currentData, columns, onChange, addToHistory]
+    [currentData, columns, readOnly, onChange, addToHistory]
   );
 
   // Handle column resize
